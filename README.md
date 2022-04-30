@@ -172,7 +172,7 @@ Here's out-of-sample preformance of our model with probability threshold of 0.5.
 # check feature importance
 SELECT *
 FROM
-ML.FEATURE_IMPORTANCE(MODEL `bigdatagroup2v1.bigdata.win_model2`)
+ML.FEATURE_IMPORTANCE(MODEL `bigdatagroup2v1.bigdata.win_model1`)
 ORDER BY importance_weight DESC
 ;
 ```
