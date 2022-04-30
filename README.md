@@ -78,7 +78,7 @@ The first step is to create a BigQuery dataset to store your model. To create yo
 1. In the Cloud Console, go to the BigQuery page.
      Go to the BigQuery page
 1. In the navigation panel, in the Resources section, click your project name.
-1. On the right side, in the details panel, click Create dataset.Create dataset.
+1. On the right side, in the details panel, click Create dataset.Create dataset. ![Create a Dataset](assets/create-dataset.png)
 1. On the Create dataset page, for Dataset ID, enter census.
 1. Leave all of the other default settings in place and click Create dataset.
 
