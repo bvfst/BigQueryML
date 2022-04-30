@@ -20,8 +20,8 @@ Machine Learning Using BigQueryML
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#contributers">Contributers</a></li>
   </ol>
 </details>
 
@@ -58,9 +58,6 @@ To get started with BigQueryML
 1. Create a free trial account with Google Cloud:- [Create Account](https://console.cloud.google.com/freetrial?_ga=2.204501072.151589388.1651269401-1400319142.1646283033)
 
 2. In the google console page:- [Create a Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
 3. [Make sure billing is enabled.](https://cloud.google.com/billing/docs/how-to/verify-billing-enabled)
 
 4. [Ensure that the API is enabled.](https://console.cloud.google.com/flows/enableapi?apiid=bigquery&_ga=2.3380720.151589388.1651269401-1400319142.1646283033)
@@ -68,61 +65,109 @@ To get started with BigQueryML
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+##### Navigate to the BigQuery Console. Check the access of your account to the console [here](https://console.cloud.google.com/bigquery?)
 
-Step one: Create your dataset
-The first step is to create a BigQuery dataset to store your model. To create your dataset, follow these steps:
+### Step one: Create a Project
+Start with creating a project in the GCP Sandbox. 
+1. In the navigation panel, there is an option to create a project right next to "Google Cloud Platform".
+2. Start with a new project.
+![Create Project](assets/Create_Project.PNG)
+All the steps going forward- the data, models and results will be stored at one place in this project.
+
+### Step two: Create your dataset
+The second step is to create a BigQuery dataset to store your model. To create your dataset, follow these steps:
 1. In the Cloud Console, go to the BigQuery page.
      Go to the BigQuery page
 1. In the navigation panel, in the Resources section, click your project name.
-1. On the right side, in the details panel, click Create dataset.Create dataset. ![Create a Dataset](assets/create-dataset.png)
+1. On the right side, in the details panel, click ![Create Dataset](assets/create-dataset.png)
 1. On the Create dataset page, for Dataset ID, enter census.
 1. Leave all of the other default settings in place and click Create dataset.
 
+### Step Three:
+Creating Tables.
+Add the data that you want to work on to the database created in step2.
+   ```sh
+CREATE TABLE IF NOT EXISTS  `big-data-bas.bigdata.main_data`
+AS 
+SELECT
+  Game_id, field_goals_made, 
+  turnovers, offensive_rebounds, 
+  defensive_rebounds, free_throws_made, 
+  assists, blocks, steals ,win,
+   CASE
+    WHEN row_num <= 20862  THEN 'training'
+    WHEN row_num <= 26822  THEN 'evaluation'
+    ELSE 'prediction'
+   END AS dataframe
+  
+FROM
+(
+  SELECT 
+    Game_id, field_goals_made, 
+    turnovers, offensive_rebounds, 
+    defensive_rebounds, free_throws_made, 
+    assists, blocks, steals ,win, ROW_NUMBER() OVER (partition by win) as row_num
+  
+  FROM `bigquery-public-data.ncaa_basketball.mbb_teams_games_sr`
+  WHERE win is NOT NULL AND
+    turnovers  IS NOT NULL AND
+    offensive_rebounds IS NOT NULL AND 
+    defensive_rebounds  IS NOT NULL AND
+    free_throws_made IS NOT NULL AND
+    assists  IS NOT NULL AND
+    blocks  IS NOT NULL AND
+    steals  IS NOT NULL AND
+    field_goals_made IS NOT NULL 
+);
+   ```
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+### Step Four:
+Create a Model.
+   ```sh
+# Model
+CREATE MODEL IF NOT EXISTS 'big-data-bas.bigdata.win_model1`
+OPTIONS 
+  (MODEL_TYPE = 'BOOSTED_TREE_CLASSIFIER', 
+  learn_rate = 0.1,
+  early_stop = TRUE,
+  input_label_cols=['win']) AS
+SELECT 
+  field_goals_made, 
+  turnovers, offensive_rebounds, 
+  defensive_rebounds, free_throws_made, 
+  assists, blocks, steals ,win
+FROM `big-data-bas.bigdata.train_V1`
+WHERE win is NOT NULL;
+```
+![Model Fine Tuning](assets/Model_performance.gif)
+You can check the performance of your classifier at different score thresholds and choose an appropriate thereshold as per your business problem.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+### Step Five:
+Evaluation of the Model's predictions:
+``` sh
+# Evaluate the model
+SELECT
+  *
+FROM
+  ML.EVALUATE (MODEL `big-data-bas.bigdata.win_model1`,
+    (
+    SELECT
+      *
+    FROM
+      `big-data-bas.bigdata.main_data`
+    WHERE
+      dataframe = 'evaluation'
+    )
+  )
+  ;
+```
+![Evaluation results](assets/Evaluate_results.PNG)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+Here's out of sample preformance of our model with probability threshold of 0.5.
 
 
 
@@ -158,7 +203,7 @@ These are some useful resources to get started with Bigquery ML.
 * Qujiaheng (Johnny) Zhang - [@LinkedIn](https://www.linkedin.com/in/qujiahengzhang/) - zhan7977@umn.edu 
 * Rahul Agarwal - [@LinkedIn](https://www.linkedin.com/in/rahula29/) - agarw276@umn.edu
 
-Project Link: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)
+Project Link: [https://github.com/bvfst/BigQueryML](https://github.com/bvfst/BigQueryML)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
