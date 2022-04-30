@@ -142,6 +142,7 @@ SELECT
 FROM `big-data-bas.bigdata.train_V1`
 WHERE win is NOT NULL;
 ```
+Model Fine Tuning
 ![Model Fine Tuning](assets/Model_performance.gif)
 You can check the performance of your classifier at different score thresholds and choose an appropriate thereshold as per your business problem.
 
@@ -164,6 +165,7 @@ FROM
   )
   ;
 ```
+Evaluation Results
 ![Evaluation results](assets/Evaluate_results.PNG)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
