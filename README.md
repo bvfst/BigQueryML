@@ -164,6 +164,7 @@ FROM
   ;
 ```
 ![Evaluation results](assets/Evaluate_results.PNG)
+Here's out-of-sample preformance of our model with probability threshold of 0.5.
 
 ### Step Six: Check Feature Importance
 
@@ -179,7 +180,7 @@ We found that 'turnovers' is the most important feature for predicting win in ba
 ![Feature importance](assets/Feature_imp.PNG)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-Here's out of sample preformance of our model with probability threshold of 0.5.
+
 
 
 
