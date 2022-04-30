@@ -77,7 +77,7 @@ Start with creating a project in the GCP Sandbox.
 ![Create Project](assets/Create_Project.PNG)
 All the steps going forward- the data, models and results will be stored at one place in this project.
 
-### Step two: Create your dataset
+### Step Two: Create your dataset
 The second step is to create a BigQuery dataset to store your model. To create your dataset, follow these steps:
 1. In the Cloud Console, go to the BigQuery page.
      Go to the BigQuery page
@@ -86,8 +86,7 @@ The second step is to create a BigQuery dataset to store your model. To create y
 1. On the Create dataset page, for Dataset ID, enter census.
 1. Leave all of the other default settings in place and click Create dataset.
 
-### Step Three:
-Creating Tables.
+### Step Three: Creating Tables
 Add the data that you want to work on to the database created in step2.
    ```sh
 CREATE TABLE IF NOT EXISTS  `big-data-bas.bigdata.main_data`
@@ -124,9 +123,9 @@ FROM
 );
    ```
 
-### Step Four:
-Create a Model.
-   ```sh
+### Step Four: Create a Model
+   
+```sh
 # Model
 CREATE MODEL IF NOT EXISTS 'big-data-bas.bigdata.win_model1`
 OPTIONS 
@@ -142,11 +141,10 @@ SELECT
 FROM `big-data-bas.bigdata.train_V1`
 WHERE win is NOT NULL;
 ```
-Model Fine Tuning
 ![Model Fine Tuning](assets/Model_performance.gif)
 You can check the performance of your classifier at different score thresholds and choose an appropriate thereshold as per your business problem.
 
-### Step Five:
+### Step Five: Model Evaluation
 Evaluation of the Model's predictions:
 ``` sh
 # Evaluate the model
@@ -165,8 +163,20 @@ FROM
   )
   ;
 ```
-Evaluation Results
 ![Evaluation results](assets/Evaluate_results.PNG)
+
+### Step Six: Check Feature Importance
+
+``` sh
+# check feature importance
+SELECT *
+FROM
+ML.FEATURE_IMPORTANCE(MODEL `bigdatagroup2v1.bigdata.win_model2`)
+ORDER BY importance_weight DESC
+;
+```
+We found that 'turnovers' is the most important feature for predicting win in basketball.
+![Feature importance](assets/Feature_imp.PNG)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 Here's out of sample preformance of our model with probability threshold of 0.5.
